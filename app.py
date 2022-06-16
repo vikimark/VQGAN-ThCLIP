@@ -13,9 +13,9 @@ from torch.utils.data import DataLoader
 import torchvision
 from torchvision import datasets, transforms
 from torchvision.models import vgg16
-from CLIP import clip 
-from torchvision import transforms 
-import torch.nn.functional as F 
+from CLIP import clip # The clip model
+from torchvision import transforms # Some useful image transforms
+import torch.nn.functional as F # Some extra methods we might need
 from omegaconf import OmegaConf
 import sys
 sys.path.append('./taming-transformers')
@@ -40,6 +40,7 @@ from urllib.request import urlopen
 from os.path import expanduser  # pylint: disable=import-outside-toplevel
 from urllib.request import urlretrieve  # pylint: disable=import-outside-toplevel
 
+#@title Helper function
 def load_vqgan_model(config_path, checkpoint_path):
     config = OmegaConf.load(config_path)
     if config.model.target == 'taming.models.vqgan.VQModel':
@@ -134,6 +135,7 @@ def get_aesthetic_model(clip_model="vit_l_14"):
     return m
 
 class CFG:
+    # captions_path = captions_path
     batch_size = 32
     num_workers = 2
     head_lr = 1e-3
@@ -168,6 +170,7 @@ class TextEncoder(nn.Module):
         for p in self.model.parameters():
             p.requires_grad = trainable
 
+        # we are using the CLS token hidden representation as the sentence's embedding
         self.target_token_idx = 0
 
     def forward(self, input_ids, attention_mask):
@@ -240,6 +243,7 @@ def get_transforms(mode="train"):
     if mode == "train":
         return A.Compose(
             [
+                # A.Resize(CFG.size, CFG.size, always_apply=True),
                 A.Normalize(max_pixel_value=255.0, always_apply=True),
             ]
         )
@@ -247,10 +251,14 @@ def add_to_prompt(text):
     global prompt_text
     st.session_state.prompt_text = prompt_text + " " + text
 
-st.write("# Thai VQGANxCLIP")
-prompt_text = st.text_input("ใส่คำเพื่อสร้างรูป", key="user_input")
-with st.expander("Prompt Engineering"):
-    negative_prompt = st.text_input("Negative prompt", value='ภาพเบลอ')
+input_help = "ถ้าเว้นวรรคแล้วใส่คำว่า \"ภาพสวย\" ต่อท้ายจะทำให้ภาพสวยขึ้น!"
+neg_help = "โมเดลจะพยายามทำให้สิ่งเหล่านี้อยู่ในภาพน้อยที่สุด"
+
+st.write("# VQGANxThCLIP -- สร้างรูปภาพจากข้อความ")
+prompt_text = st.text_input("ใส่คำเพื่อสร้างรูป", key="user_input", help=input_help)
+with st.expander("เพิ่มสไตล์ของภาพ"):
+    negative_prompt = st.text_input("เพิ่มสิ่งที่ไม่อยากให้อยู่ในภาพ", value='ภาพเบลอ', help=neg_help)
+    st.write("เพิ่มสไตล์ของภาพโดยใส่คำเหล่านี้ (สามารถใส่มากกว่า 1 สไตล์ได้!)")
     col1, col2, col3, col4 =  st.columns(4)
     listofenhancers = [
         "ภาพสวย",
@@ -283,7 +291,7 @@ with st.expander("Prompt Engineering"):
             with col4:
                 st.button(enhancer, on_click=add_to_prompt, args=(enhancer,))
 
-with st.expander("model setting"):
+with st.expander("ตั้งค่าโมเดล"):
     col1, col2, col3 = st.columns(3)
 
     with col1:
@@ -293,8 +301,8 @@ with st.expander("model setting"):
     with col3:
         height = st.number_input("Height", value=256, min_value=64, step=64)
     
-    init_image = st.file_uploader("Start with an initial image")
-    target_image = st.file_uploader("Use image as a prompt")
+    init_image = st.file_uploader("ใส่รูปเริ่มต้น (optional)")
+    target_image = st.file_uploader("ใส่รูปเพื่อเป็นเป้าหมาย (optional)")
     
     st.write("Advanced setting (optional)")
     scol1, scol2, scol3 = st.columns(3)
@@ -367,7 +375,7 @@ def run():
         with torch.no_grad():
             tar_embed = clip_model.encode_image(normalize(im).to(device)).float()
 
-    # The z that will be optimized
+    # The z we'll be optimizing
     if init_image is not None:
         if 'http' in init_image:
             img = Image.open(urlopen(init_image)).convert('RGB').resize((width, height))
@@ -385,18 +393,31 @@ def run():
         text_embed = text_model.encode_text([process_transformers(prompt_text)]).to(device).float()
         neg_text_embed = text_model.encode_text([process_transformers(negative_prompt)]).to(device).float()
 
+    # The optimizer - feel free to try different ones here
     optimizer = torch.optim.Adam([z], lr=lr, weight_decay=1e-6)
 
-    losses = []
+    losses = [] # Keep track of our losses (RMSE values)
+
+    # A folder to save results
+    # !rm -r steps
+    # !mkdir steps
+
+
+    # Display for showing progress
+    # fig, axs = plt.subplots(1, 2, figsize=(8, 4))
+    # p = display(fig, display_id=True)
 
     # The optimization loop:
     for i in range(int(iters)):
         last_step.write(f'{i+1} / {int(iters)}')
         bar.progress(int((i+1)/iters * 100))
+    # Reset everything related to gradient calculations
         optimizer.zero_grad()
 
+        # Get the GAN output
         output = synth(z)
 
+        # Calculate our loss across several different random crops/transforms
         loss = 0
         for _ in range(int(crops_per_iteration)):
             image_embed = clip_model.encode_image(normalize(tfms(output)).to(device)).float()
@@ -414,18 +435,22 @@ def run():
         losses.append(loss.detach().item())  
         # Save image
         im_arr = np.array(output.cpu().squeeze().detach().permute(1, 2, 0)*255).astype(np.uint8)
+        # Image.fromarray(im_arr).save(f'steps/{i:04}.jpeg')
         Image.fromarray(im_arr).save(f'steps/{prompt_text}.jpeg')
 
-        # Update 
+        # Update plots 
         if i % 5 == 0: # Saving time
             im_arr = np.array(output.cpu().squeeze().detach().permute(1, 2, 0)*255).astype(np.uint8)
             image_holder.image(Image.fromarray(im_arr))
 
-        loss.backward()
-        optimizer.step()
+        # Backpropagate the loss and use it to update the parameters
+        loss.backward() # This does all the gradient calculations
+        optimizer.step() # The optimizer does the update
     
     last_step.empty()
     bar.empty()
+
+    # ipd.clear_output()
 
 if submit:
     download.empty()
@@ -437,7 +462,7 @@ if submit:
     image.save(buf, format="JPEG")
     byte_im = buf.getvalue()
     download.download_button(
-        label="Download image",
+        label="Download picture",
         data=byte_im,
         file_name=prompt_text,
         mime="image/jpeg"
