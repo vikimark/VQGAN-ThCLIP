@@ -11,7 +11,7 @@ This model is text-to-image synthesis based on VQGAN with CLIP as a loss functio
 
 ## Demo
 
-A local deploy streamlit app on Google Colab can be found [here!](https://colab.research.google.com/github/vikimark/VQGAN-ThCLIP/blob/master/Streamlit_VQGANxThaiCLIP.ipynb) <br />Just select Runtime -> run all. wait about 3 minutes, then your url should appear at the bottom of the notebook with the sentence "your url is ..."
+A local deploy streamlit app on Google Colab can be found [here!](https://colab.research.google.com/github/vikimark/VQGAN-ThCLIP/blob/master/Streamlit_VQGANxThaiCLIP.ipynb) <br />Just select Runtime -> run all. wait about 3 minutes, then your url should appear at the bottom of the notebook with the message "your url is ..."
 
 ## Examples
 
