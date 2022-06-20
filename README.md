@@ -7,10 +7,19 @@
 
 ## Overview
 
+This model is text-to-image synthesis based on VQGAN with CLIP as a loss function.<br />CLIP was trained on GCC+MSCOCO sample for 2M sentences which were translated to Thai by AIReseach translation model using Teacher learning method by [FreddeFrallan](https://github.com/FreddeFrallan/Multilingual-CLIP)
+
 ## Demo
+
+A local deploy streamlit app on Google Colab can be found [here!](https://colab.research.google.com/github/vikimark/VQGAN-ThCLIP/blob/master/Streamlit_VQGANxThaiCLIP.ipynb) <br />Just select Runtime -> run all. wait about 3 minutes, then your url should appear at the bottom of the notebook with the sentence "your url is ..."
 
 ## Examples
 
 <img src="./sample_image/1_Kc2dl0cYk-K7IY3Nx-k61w.png"></img>
 
 ## Acknowledgements
+
+* [AI Builders](https://github.com/ai-builders/ai-builders.github.io) for providing knowledge and support along the way<br />
+* [Multilingual-CLIP](https://github.com/FreddeFrallan/Multilingual-CLIP) for Teacher learning method<br />
+* [OpenAI's CLIP](https://github.com/openai/CLIP)<br />
+* [AIResearch's translation model](https://airesearch.in.th/releases/machine-translation-models)<br />
