@@ -464,7 +464,7 @@ if submit:
     download.download_button(
         label="Download picture",
         data=byte_im,
-        file_name=prompt_text,
+        file_name=prompt_text+'.jpeg',
         mime="image/jpeg"
     )
     
