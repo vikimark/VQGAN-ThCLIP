@@ -7,7 +7,7 @@
 
 ## Overview
 
-This model is text-to-image synthesis based on VQGAN with CLIP as a loss function.<br />CLIP was trained on GCC+MSCOCO sample for 2M sentences which were translated to Thai by AIReseach translation model using Teacher learning method by [FreddeFrallan](https://github.com/FreddeFrallan/Multilingual-CLIP)
+This model is text-to-image synthesis based on VQGAN with CLIP as a loss function.<br />CLIP was trained on GCC+MSCOCO sample for 2M sentences, which were translated to Thai by AIReseach translation model, using Teacher learning method by [FreddeFrallan](https://github.com/FreddeFrallan/Multilingual-CLIP)
 
 ## Demo
 
