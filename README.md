@@ -17,6 +17,10 @@ A local deploy streamlit app on Google Colab can be found [here!](https://colab.
 
 <img src="./sample_image/1_Kc2dl0cYk-K7IY3Nx-k61w.png"></img>
 
+## other relate work(s)
+
+* [Thai-Cross-CLIP](https://github.com/vikimark/Thai-Cross-CLIP): Thai CLIP text encoder model trained via Teacher Learning
+
 ## Acknowledgements
 
 * [AI Builders](https://github.com/ai-builders/ai-builders.github.io) for providing knowledge and support along the way<br />
