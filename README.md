@@ -3,11 +3,13 @@
   <h3 align="center">Text-to-image synthesis model in Thai language</h3>
 </p>
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/vikimark/VQGAN-ThCLIP/blob/master/Streamlit_VQGANxThaiCLIP.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/vikimark/VQGAN-ThCLIP/blob/master/Streamlit_VQGANxThaiCLIP.ipynb) [![Medium Badge](https://img.shields.io/badge/-How_Thai_image_generative_model_is_made-gray?style=flat-square&labelColor=000000&logo=Medium&link=https://medium.com/@phuritsiritip)](https://medium.com/@phuritsiritip/โครงการ-ai-builders-กับ-ai-สร้างภาพจากข้อความสร้างโดยเด็กมัธยมปลาย-ที่เกือบจะขึ้นปี-1-ed5878c7a72c)
 
 ## Overview
 
 This model is text-to-image synthesis based on VQGAN with CLIP as a loss function.<br />CLIP was trained on GCC+MSCOCO sample for 2M sentences, which were translated to Thai by AIReseach translation model, using Teacher learning method by [FreddeFrallan](https://github.com/FreddeFrallan/Multilingual-CLIP)
+
+You can learn more about this project [here!](https://medium.com/@phuritsiritip/โครงการ-ai-builders-กับ-ai-สร้างภาพจากข้อความสร้างโดยเด็กมัธยมปลาย-ที่เกือบจะขึ้นปี-1-ed5878c7a72c)
 
 ## Demo
 
